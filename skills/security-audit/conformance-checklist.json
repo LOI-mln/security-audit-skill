@@ -1,0 +1,1381 @@
+{
+  "$comment": "Source-verifiable security controls for the standards conformance review. Statements are original wording; the identifiers point at the OWASP ASVS 5.0.0 requirements, OWASP Top 10:2025 categories, ISO/IEC 27001:2022 Annex A controls and CWE weaknesses each control relates to. The cwe list names the weakness a gap would be, not a claim that it is present.",
+  "version": "1.0.0",
+  "families": {
+    "AC": {
+      "title": "Authorization and access control",
+      "controls": [
+        {
+          "control_id": "AC-01",
+          "statement": "Every non-public route, handler, job trigger or RPC is covered by a server-side authentication and authorization decision applied at a central point (middleware, guard, policy, gateway), and unlisted routes are denied by default.",
+          "standards": {
+            "cwe": [
+              "CWE-862",
+              "CWE-306"
+            ],
+            "owasp_top10": [
+              "A01:2025"
+            ],
+            "owasp_asvs": [
+              "v5.0.0-8.2.1",
+              "v5.0.0-8.3.1"
+            ],
+            "iso27001": [
+              "A.5.15",
+              "A.8.3"
+            ]
+          }
+        },
+        {
+          "control_id": "AC-02",
+          "statement": "Records selected by a client-supplied identifier are restricted to what the caller owns or is entitled to (owner, tenant, group, role scope) on read, write, delete, export and bulk paths alike.",
+          "standards": {
+            "cwe": [
+              "CWE-639"
+            ],
+            "owasp_top10": [
+              "A01:2025"
+            ],
+            "owasp_asvs": [
+              "v5.0.0-8.2.2"
+            ],
+            "iso27001": [
+              "A.8.3"
+            ]
+          }
+        },
+        {
+          "control_id": "AC-03",
+          "statement": "Fields a caller may not set or read (role, owner, status flags, internal identifiers, secrets) are excluded from mass assignment and from serialized responses.",
+          "standards": {
+            "cwe": [
+              "CWE-915"
+            ],
+            "owasp_top10": [
+              "A01:2025",
+              "A08:2025"
+            ],
+            "owasp_asvs": [
+              "v5.0.0-8.2.3",
+              "v5.0.0-15.3.3",
+              "v5.0.0-15.3.1"
+            ],
+            "iso27001": [
+              "A.8.3"
+            ]
+          }
+        },
+        {
+          "control_id": "AC-04",
+          "statement": "Administrative functions and privilege changes (roles, user management, impersonation, configuration) are reachable only by privileged roles and cannot be self-granted.",
+          "standards": {
+            "cwe": [
+              "CWE-269"
+            ],
+            "owasp_top10": [
+              "A01:2025"
+            ],
+            "owasp_asvs": [
+              "v5.0.0-8.2.1"
+            ],
+            "iso27001": [
+              "A.8.2",
+              "A.5.18"
+            ]
+          }
+        },
+        {
+          "control_id": "AC-05",
+          "statement": "State-changing requests authenticated by cookies use non-safe HTTP methods and carry anti-CSRF protection or an equivalent origin check; no route is exempted without a reason visible in source.",
+          "standards": {
+            "cwe": [
+              "CWE-352"
+            ],
+            "owasp_top10": [
+              "A01:2025"
+            ],
+            "owasp_asvs": [
+              "v5.0.0-3.5.1",
+              "v5.0.0-3.5.3"
+            ],
+            "iso27001": [
+              "A.8.26"
+            ]
+          }
+        },
+        {
+          "control_id": "AC-06",
+          "statement": "Server-side requests to caller-influenced URLs are restricted by an allowlist of schemes, hosts and ports and do not follow redirects to internal addresses.",
+          "standards": {
+            "cwe": [
+              "CWE-918"
+            ],
+            "owasp_top10": [
+              "A01:2025"
+            ],
+            "owasp_asvs": [
+              "v5.0.0-1.3.6",
+              "v5.0.0-15.3.2"
+            ],
+            "iso27001": [
+              "A.8.22",
+              "A.8.28"
+            ]
+          }
+        }
+      ]
+    },
+    "AU": {
+      "title": "Authentication and credentials",
+      "controls": [
+        {
+          "control_id": "AU-01",
+          "statement": "Passwords are stored only with a salted, computationally intensive key-derivation function (Argon2id, bcrypt, scrypt, PBKDF2) at current work factors.",
+          "standards": {
+            "cwe": [
+              "CWE-916"
+            ],
+            "owasp_top10": [
+              "A04:2025"
+            ],
+            "owasp_asvs": [
+              "v5.0.0-11.4.2"
+            ],
+            "iso27001": [
+              "A.5.17",
+              "A.8.24"
+            ]
+          }
+        },
+        {
+          "control_id": "AU-02",
+          "statement": "The password policy requires at least 8 characters (15 recommended), accepts long passwords and any characters, and checks new passwords against common or breached passwords.",
+          "standards": {
+            "cwe": [
+              "CWE-521"
+            ],
+            "owasp_top10": [
+              "A07:2025"
+            ],
+            "owasp_asvs": [
+              "v5.0.0-6.2.1",
+              "v5.0.0-6.2.4",
+              "v5.0.0-6.2.5",
+              "v5.0.0-6.2.9"
+            ],
+            "iso27001": [
+              "A.5.17"
+            ]
+          }
+        },
+        {
+          "control_id": "AU-03",
+          "statement": "Login, password reset and other credential-checking endpoints are rate limited or locked out per account and per source to resist brute force and credential stuffing.",
+          "standards": {
+            "cwe": [
+              "CWE-307"
+            ],
+            "owasp_top10": [
+              "A07:2025"
+            ],
+            "owasp_asvs": [
+              "v5.0.0-6.3.1",
+              "v5.0.0-2.4.1"
+            ],
+            "iso27001": [
+              "A.8.5"
+            ]
+          }
+        },
+        {
+          "control_id": "AU-04",
+          "statement": "No default, shared, seeded or test account with known credentials exists in a code path, seeder, migration or fixture that can run in production.",
+          "standards": {
+            "cwe": [
+              "CWE-1392",
+              "CWE-798"
+            ],
+            "owasp_top10": [
+              "A07:2025"
+            ],
+            "owasp_asvs": [
+              "v5.0.0-6.3.2"
+            ],
+            "iso27001": [
+              "A.5.17",
+              "A.8.5"
+            ]
+          }
+        },
+        {
+          "control_id": "AU-05",
+          "statement": "Changing a password requires the current one; password reset uses single-use, expiring, random tokens delivered out of band and does not reveal whether an account exists.",
+          "standards": {
+            "cwe": [
+              "CWE-640",
+              "CWE-620"
+            ],
+            "owasp_top10": [
+              "A07:2025"
+            ],
+            "owasp_asvs": [
+              "v5.0.0-6.2.3",
+              "v5.0.0-6.4.3",
+              "v5.0.0-6.3.8"
+            ],
+            "iso27001": [
+              "A.5.17"
+            ]
+          }
+        },
+        {
+          "control_id": "AU-06",
+          "statement": "Initial passwords and activation codes are generated with a cryptographically secure random generator, expire, and must be replaced at first use.",
+          "standards": {
+            "cwe": [
+              "CWE-330"
+            ],
+            "owasp_top10": [
+              "A07:2025"
+            ],
+            "owasp_asvs": [
+              "v5.0.0-6.4.1"
+            ],
+            "iso27001": [
+              "A.5.17"
+            ]
+          }
+        },
+        {
+          "control_id": "AU-07",
+          "statement": "Multi-factor authentication is available for privileged accounts, or the decision not to offer it is documented with its risk.",
+          "standards": {
+            "cwe": [
+              "CWE-308"
+            ],
+            "owasp_top10": [
+              "A07:2025"
+            ],
+            "owasp_asvs": [
+              "v5.0.0-6.3.3"
+            ],
+            "iso27001": [
+              "A.8.5"
+            ]
+          }
+        }
+      ]
+    },
+    "SM": {
+      "title": "Session management",
+      "controls": [
+        {
+          "control_id": "SM-01",
+          "statement": "A new session identifier is issued at login and at privilege change, and the previous one is invalidated.",
+          "standards": {
+            "cwe": [
+              "CWE-384"
+            ],
+            "owasp_top10": [
+              "A07:2025"
+            ],
+            "owasp_asvs": [
+              "v5.0.0-7.2.4"
+            ],
+            "iso27001": [
+              "A.8.5"
+            ]
+          }
+        },
+        {
+          "control_id": "SM-02",
+          "statement": "Logout, account deactivation or deletion, and password change terminate the affected sessions on the server.",
+          "standards": {
+            "cwe": [
+              "CWE-613"
+            ],
+            "owasp_top10": [
+              "A07:2025"
+            ],
+            "owasp_asvs": [
+              "v5.0.0-7.4.1",
+              "v5.0.0-7.4.2",
+              "v5.0.0-7.4.3"
+            ],
+            "iso27001": [
+              "A.8.5",
+              "A.5.18"
+            ]
+          }
+        },
+        {
+          "control_id": "SM-03",
+          "statement": "Sessions have an inactivity timeout and an absolute lifetime suited to the data handled.",
+          "standards": {
+            "cwe": [
+              "CWE-613"
+            ],
+            "owasp_top10": [
+              "A07:2025"
+            ],
+            "owasp_asvs": [
+              "v5.0.0-7.3.1",
+              "v5.0.0-7.3.2"
+            ],
+            "iso27001": [
+              "A.8.5"
+            ]
+          }
+        },
+        {
+          "control_id": "SM-04",
+          "statement": "Session and other sensitive cookies set Secure, HttpOnly and an explicit SameSite value, with the narrowest domain and path.",
+          "standards": {
+            "cwe": [
+              "CWE-614",
+              "CWE-1004",
+              "CWE-1275"
+            ],
+            "owasp_top10": [
+              "A02:2025"
+            ],
+            "owasp_asvs": [
+              "v5.0.0-3.3.1",
+              "v5.0.0-3.3.2",
+              "v5.0.0-3.3.4"
+            ],
+            "iso27001": [
+              "A.8.26"
+            ]
+          }
+        },
+        {
+          "control_id": "SM-05",
+          "statement": "Session tokens are random values from a cryptographically secure generator or the framework session store, are verified on the server, and never appear in URLs or logs.",
+          "standards": {
+            "cwe": [
+              "CWE-331",
+              "CWE-598"
+            ],
+            "owasp_top10": [
+              "A07:2025"
+            ],
+            "owasp_asvs": [
+              "v5.0.0-7.2.1",
+              "v5.0.0-7.2.2",
+              "v5.0.0-7.2.3",
+              "v5.0.0-14.2.1"
+            ],
+            "iso27001": [
+              "A.8.5"
+            ]
+          }
+        }
+      ]
+    },
+    "IV": {
+      "title": "Input validation, encoding and injection",
+      "controls": [
+        {
+          "control_id": "IV-01",
+          "statement": "Database access uses parameterized queries, a query builder or an ORM; no query text, column name or ORDER BY clause is concatenated from untrusted input.",
+          "standards": {
+            "cwe": [
+              "CWE-89"
+            ],
+            "owasp_top10": [
+              "A05:2025"
+            ],
+            "owasp_asvs": [
+              "v5.0.0-1.2.4"
+            ],
+            "iso27001": [
+              "A.8.28"
+            ]
+          }
+        },
+        {
+          "control_id": "IV-02",
+          "statement": "Operating-system commands are not built from untrusted input; subprocess calls pass an argument array without a shell and validate every value they pass.",
+          "standards": {
+            "cwe": [
+              "CWE-78",
+              "CWE-88"
+            ],
+            "owasp_top10": [
+              "A05:2025"
+            ],
+            "owasp_asvs": [
+              "v5.0.0-1.2.5"
+            ],
+            "iso27001": [
+              "A.8.28"
+            ]
+          }
+        },
+        {
+          "control_id": "IV-03",
+          "statement": "Output is context-encoded by default (auto-escaping templates, text bindings); every raw HTML sink (v-html, innerHTML, dangerouslySetInnerHTML, unescaped template tags) receives sanitized or constant content.",
+          "standards": {
+            "cwe": [
+              "CWE-79"
+            ],
+            "owasp_top10": [
+              "A05:2025"
+            ],
+            "owasp_asvs": [
+              "v5.0.0-1.2.1",
+              "v5.0.0-1.3.1",
+              "v5.0.0-3.2.2"
+            ],
+            "iso27001": [
+              "A.8.28"
+            ]
+          }
+        },
+        {
+          "control_id": "IV-04",
+          "statement": "Untrusted input never reaches dynamic code evaluation, unsafe deserialization or template construction (eval, unserialize, pickle, unsafe YAML load, server-side template strings).",
+          "standards": {
+            "cwe": [
+              "CWE-95",
+              "CWE-502",
+              "CWE-1336"
+            ],
+            "owasp_top10": [
+              "A05:2025",
+              "A08:2025"
+            ],
+            "owasp_asvs": [
+              "v5.0.0-1.3.2",
+              "v5.0.0-1.5.2",
+              "v5.0.0-1.3.7"
+            ],
+            "iso27001": [
+              "A.8.28"
+            ]
+          }
+        },
+        {
+          "control_id": "IV-05",
+          "statement": "All input is validated on the server against type, range, length and allowed values at a trusted layer; client-side validation is never the only check.",
+          "standards": {
+            "cwe": [
+              "CWE-1287",
+              "CWE-1284"
+            ],
+            "owasp_top10": [
+              "A05:2025"
+            ],
+            "owasp_asvs": [
+              "v5.0.0-2.2.1",
+              "v5.0.0-2.2.2"
+            ],
+            "iso27001": [
+              "A.8.26",
+              "A.8.28"
+            ]
+          }
+        },
+        {
+          "control_id": "IV-06",
+          "statement": "Redirect targets and URLs built from input are limited to an allowlist or to same-origin relative paths.",
+          "standards": {
+            "cwe": [
+              "CWE-601"
+            ],
+            "owasp_top10": [
+              "A01:2025"
+            ],
+            "owasp_asvs": [
+              "v5.0.0-3.7.2",
+              "v5.0.0-1.2.2"
+            ],
+            "iso27001": [
+              "A.8.28"
+            ]
+          }
+        },
+        {
+          "control_id": "IV-07",
+          "statement": "Generated documents encode untrusted data for their format: spreadsheet exports (CSV, XLSX) neutralize formula-leading characters, and HTML mail, PDF and other rendered output escape user-controlled values.",
+          "standards": {
+            "cwe": [
+              "CWE-1236"
+            ],
+            "owasp_top10": [
+              "A05:2025"
+            ],
+            "owasp_asvs": [
+              "v5.0.0-1.2.10",
+              "v5.0.0-1.3.11"
+            ],
+            "iso27001": [
+              "A.8.28"
+            ]
+          }
+        }
+      ]
+    },
+    "FH": {
+      "title": "File handling",
+      "controls": [
+        {
+          "control_id": "FH-01",
+          "statement": "Uploads and imports are limited in size and count before processing, and their type is checked by extension and by content against an allowlist.",
+          "standards": {
+            "cwe": [
+              "CWE-434",
+              "CWE-770"
+            ],
+            "owasp_top10": [
+              "A06:2025"
+            ],
+            "owasp_asvs": [
+              "v5.0.0-5.2.1",
+              "v5.0.0-5.2.2"
+            ],
+            "iso27001": [
+              "A.8.7",
+              "A.8.28"
+            ]
+          }
+        },
+        {
+          "control_id": "FH-02",
+          "statement": "File names and paths are generated on the server or strictly validated; a user-supplied name never selects a filesystem path on upload, download, import or archive extraction.",
+          "standards": {
+            "cwe": [
+              "CWE-22",
+              "CWE-73"
+            ],
+            "owasp_top10": [
+              "A01:2025"
+            ],
+            "owasp_asvs": [
+              "v5.0.0-5.3.2",
+              "v5.0.0-5.4.1",
+              "v5.0.0-5.3.3"
+            ],
+            "iso27001": [
+              "A.8.3",
+              "A.8.28"
+            ]
+          }
+        },
+        {
+          "control_id": "FH-03",
+          "statement": "Uploaded or generated files are stored outside the web root or served as inert downloads (fixed content type, Content-Disposition, nosniff), never executed or rendered as active content.",
+          "standards": {
+            "cwe": [
+              "CWE-434"
+            ],
+            "owasp_top10": [
+              "A06:2025"
+            ],
+            "owasp_asvs": [
+              "v5.0.0-5.3.1",
+              "v5.0.0-5.4.2",
+              "v5.0.0-3.2.1"
+            ],
+            "iso27001": [
+              "A.8.28"
+            ]
+          }
+        },
+        {
+          "control_id": "FH-04",
+          "statement": "Parsers for uploaded structured content (XML, spreadsheets, archives, images, documents) disable external entities and bound decompression and size.",
+          "standards": {
+            "cwe": [
+              "CWE-611",
+              "CWE-409"
+            ],
+            "owasp_top10": [
+              "A02:2025"
+            ],
+            "owasp_asvs": [
+              "v5.0.0-1.5.1",
+              "v5.0.0-5.2.3"
+            ],
+            "iso27001": [
+              "A.8.28"
+            ]
+          }
+        }
+      ]
+    },
+    "WF": {
+      "title": "Web frontend and browser mechanisms",
+      "controls": [
+        {
+          "control_id": "WF-01",
+          "statement": "Responses carry a Content-Security-Policy that restricts script sources (no blanket unsafe-inline or unsafe-eval without a nonce or hash) and forbids framing by other origins (frame-ancestors or X-Frame-Options).",
+          "standards": {
+            "cwe": [
+              "CWE-1021"
+            ],
+            "owasp_top10": [
+              "A02:2025"
+            ],
+            "owasp_asvs": [
+              "v5.0.0-3.4.3",
+              "v5.0.0-3.4.6"
+            ],
+            "iso27001": [
+              "A.8.9",
+              "A.8.26"
+            ]
+          }
+        },
+        {
+          "control_id": "WF-02",
+          "statement": "X-Content-Type-Options: nosniff and a Referrer-Policy are sent on all responses.",
+          "standards": {
+            "cwe": [
+              "CWE-1188"
+            ],
+            "owasp_top10": [
+              "A02:2025"
+            ],
+            "owasp_asvs": [
+              "v5.0.0-3.4.4",
+              "v5.0.0-3.4.5"
+            ],
+            "iso27001": [
+              "A.8.9"
+            ]
+          }
+        },
+        {
+          "control_id": "WF-03",
+          "statement": "HTTPS is enforced end to end: plain HTTP is redirected or refused and Strict-Transport-Security is sent.",
+          "standards": {
+            "cwe": [
+              "CWE-319"
+            ],
+            "owasp_top10": [
+              "A04:2025"
+            ],
+            "owasp_asvs": [
+              "v5.0.0-3.4.1",
+              "v5.0.0-12.2.1",
+              "v5.0.0-4.1.2"
+            ],
+            "iso27001": [
+              "A.8.20",
+              "A.8.24"
+            ]
+          }
+        },
+        {
+          "control_id": "WF-04",
+          "statement": "CORS allows only an explicit list of trusted origins; credentials are never combined with a wildcard or reflected origin.",
+          "standards": {
+            "cwe": [
+              "CWE-942"
+            ],
+            "owasp_top10": [
+              "A02:2025"
+            ],
+            "owasp_asvs": [
+              "v5.0.0-3.4.2"
+            ],
+            "iso27001": [
+              "A.8.26"
+            ]
+          }
+        },
+        {
+          "control_id": "WF-05",
+          "statement": "Third-party scripts, styles and fonts are self-hosted or pinned with Subresource Integrity; nothing executable is loaded from an origin outside a documented list.",
+          "standards": {
+            "cwe": [
+              "CWE-829",
+              "CWE-353"
+            ],
+            "owasp_top10": [
+              "A03:2025",
+              "A08:2025"
+            ],
+            "owasp_asvs": [
+              "v5.0.0-3.6.1"
+            ],
+            "iso27001": [
+              "A.8.26"
+            ]
+          }
+        },
+        {
+          "control_id": "WF-06",
+          "statement": "Authenticated data is not kept in browser storage beyond need: no secret or session token in localStorage or sessionStorage, and client state is cleared at logout.",
+          "standards": {
+            "cwe": [
+              "CWE-922"
+            ],
+            "owasp_top10": [
+              "A07:2025"
+            ],
+            "owasp_asvs": [
+              "v5.0.0-14.3.1",
+              "v5.0.0-14.3.3"
+            ],
+            "iso27001": [
+              "A.8.12"
+            ]
+          }
+        }
+      ]
+    },
+    "CR": {
+      "title": "Cryptography and transport",
+      "controls": [
+        {
+          "control_id": "CR-01",
+          "statement": "Only current algorithms and modes are used (authenticated encryption such as AES-GCM or ChaCha20-Poly1305, SHA-2 or SHA-3, at least 128 bits of security); no MD5 or SHA-1 for a security purpose, no ECB, no home-made cryptography.",
+          "standards": {
+            "cwe": [
+              "CWE-327",
+              "CWE-328"
+            ],
+            "owasp_top10": [
+              "A04:2025"
+            ],
+            "owasp_asvs": [
+              "v5.0.0-11.3.1",
+              "v5.0.0-11.3.2",
+              "v5.0.0-11.4.1",
+              "v5.0.0-11.2.1"
+            ],
+            "iso27001": [
+              "A.8.24"
+            ]
+          }
+        },
+        {
+          "control_id": "CR-02",
+          "statement": "Security-sensitive random values (tokens, identifiers, reset codes, keys, nonces) come from a cryptographically secure generator.",
+          "standards": {
+            "cwe": [
+              "CWE-338"
+            ],
+            "owasp_top10": [
+              "A04:2025"
+            ],
+            "owasp_asvs": [
+              "v5.0.0-11.5.1"
+            ],
+            "iso27001": [
+              "A.8.24"
+            ]
+          }
+        },
+        {
+          "control_id": "CR-03",
+          "statement": "Secrets, tokens and signatures are compared in constant time, and signed or encrypted values are verified before use, failing closed on error.",
+          "standards": {
+            "cwe": [
+              "CWE-208",
+              "CWE-347"
+            ],
+            "owasp_top10": [
+              "A04:2025"
+            ],
+            "owasp_asvs": [
+              "v5.0.0-11.2.4",
+              "v5.0.0-11.2.5",
+              "v5.0.0-11.3.3"
+            ],
+            "iso27001": [
+              "A.8.24"
+            ]
+          }
+        },
+        {
+          "control_id": "CR-04",
+          "statement": "Outbound connections (database, mail, APIs, internal services) use TLS with certificate validation; verification is never disabled in code or shipped configuration.",
+          "standards": {
+            "cwe": [
+              "CWE-295",
+              "CWE-319"
+            ],
+            "owasp_top10": [
+              "A04:2025"
+            ],
+            "owasp_asvs": [
+              "v5.0.0-12.3.1",
+              "v5.0.0-12.3.2"
+            ],
+            "iso27001": [
+              "A.8.21",
+              "A.8.24"
+            ]
+          }
+        }
+      ]
+    },
+    "CF": {
+      "title": "Configuration and secrets",
+      "controls": [
+        {
+          "control_id": "CF-01",
+          "statement": "No working secret (password, API key, private key, token, application key) is committed in the repository tree, an image, or an example file; secrets come from the environment or a secret store.",
+          "standards": {
+            "cwe": [
+              "CWE-798"
+            ],
+            "owasp_top10": [
+              "A02:2025",
+              "A07:2025"
+            ],
+            "owasp_asvs": [
+              "v5.0.0-13.3.1"
+            ],
+            "iso27001": [
+              "A.5.17",
+              "A.8.9"
+            ]
+          }
+        },
+        {
+          "control_id": "CF-02",
+          "statement": "Debug mode, verbose errors, development tooling and profiling endpoints are off by default and cannot be switched on in production by a request.",
+          "standards": {
+            "cwe": [
+              "CWE-489",
+              "CWE-215"
+            ],
+            "owasp_top10": [
+              "A02:2025"
+            ],
+            "owasp_asvs": [
+              "v5.0.0-13.4.2",
+              "v5.0.0-13.4.5",
+              "v5.0.0-15.2.3"
+            ],
+            "iso27001": [
+              "A.8.9",
+              "A.8.31"
+            ]
+          }
+        },
+        {
+          "control_id": "CF-03",
+          "statement": "Shipped defaults are safe: example and default environment files do not weaken security (empty or default passwords, wildcard hosts, permissive flags) when used as provided.",
+          "standards": {
+            "cwe": [
+              "CWE-1188",
+              "CWE-1392"
+            ],
+            "owasp_top10": [
+              "A02:2025"
+            ],
+            "owasp_asvs": [
+              "v5.0.0-13.2.3"
+            ],
+            "iso27001": [
+              "A.8.9"
+            ]
+          }
+        },
+        {
+          "control_id": "CF-04",
+          "statement": "Services, containers and database accounts run with least privilege: non-root users, minimal capabilities, no unnecessary published ports, scoped database grants.",
+          "standards": {
+            "cwe": [
+              "CWE-250"
+            ],
+            "owasp_top10": [
+              "A02:2025"
+            ],
+            "owasp_asvs": [
+              "v5.0.0-13.2.2",
+              "v5.0.0-13.3.2"
+            ],
+            "iso27001": [
+              "A.8.2",
+              "A.8.9",
+              "A.8.22"
+            ]
+          }
+        },
+        {
+          "control_id": "CF-05",
+          "statement": "The deployed artifact excludes source-control metadata, backups and test files, exposes no directory listing, and the web tier serves only intended files.",
+          "standards": {
+            "cwe": [
+              "CWE-538",
+              "CWE-548"
+            ],
+            "owasp_top10": [
+              "A02:2025"
+            ],
+            "owasp_asvs": [
+              "v5.0.0-13.4.1",
+              "v5.0.0-13.4.3",
+              "v5.0.0-13.4.7"
+            ],
+            "iso27001": [
+              "A.8.9"
+            ]
+          }
+        },
+        {
+          "control_id": "CF-06",
+          "statement": "Trusted-proxy, host and forwarded-header handling is limited to known proxies so a client cannot spoof scheme, host or source address.",
+          "standards": {
+            "cwe": [
+              "CWE-348"
+            ],
+            "owasp_top10": [
+              "A02:2025"
+            ],
+            "owasp_asvs": [
+              "v5.0.0-4.1.3",
+              "v5.0.0-15.3.4"
+            ],
+            "iso27001": [
+              "A.8.9",
+              "A.8.20"
+            ]
+          }
+        }
+      ]
+    },
+    "DP": {
+      "title": "Data protection and privacy",
+      "controls": [
+        {
+          "control_id": "DP-01",
+          "statement": "Sensitive data travels only in request bodies or headers over TLS, never in URLs, and responses that contain it disable caching.",
+          "standards": {
+            "cwe": [
+              "CWE-598",
+              "CWE-525"
+            ],
+            "owasp_top10": [
+              "A04:2025"
+            ],
+            "owasp_asvs": [
+              "v5.0.0-14.2.1",
+              "v5.0.0-14.3.2",
+              "v5.0.0-14.2.2"
+            ],
+            "iso27001": [
+              "A.8.12",
+              "A.5.34"
+            ]
+          }
+        },
+        {
+          "control_id": "DP-02",
+          "statement": "API responses and exports return only the fields the caller needs; password hashes, tokens and internal attributes are never serialized.",
+          "standards": {
+            "cwe": [
+              "CWE-201",
+              "CWE-359"
+            ],
+            "owasp_top10": [
+              "A01:2025"
+            ],
+            "owasp_asvs": [
+              "v5.0.0-15.3.1",
+              "v5.0.0-14.2.6"
+            ],
+            "iso27001": [
+              "A.8.11",
+              "A.8.12",
+              "A.5.34"
+            ]
+          }
+        },
+        {
+          "control_id": "DP-03",
+          "statement": "Personal data has a stated purpose, retention period and deletion path, and deletion or anonymization also removes derived copies (exports, caches, logs).",
+          "standards": {
+            "cwe": [
+              "CWE-359"
+            ],
+            "owasp_top10": [
+              "A06:2025"
+            ],
+            "owasp_asvs": [
+              "v5.0.0-14.1.1",
+              "v5.0.0-14.2.4",
+              "v5.0.0-14.2.7"
+            ],
+            "iso27001": [
+              "A.5.34",
+              "A.8.10"
+            ]
+          }
+        },
+        {
+          "control_id": "DP-04",
+          "statement": "Test and seed data contain no real personal data or production secrets, and production data is not copied into development.",
+          "standards": {
+            "owasp_top10": [
+              "A02:2025"
+            ],
+            "iso27001": [
+              "A.8.33",
+              "A.8.31"
+            ]
+          }
+        }
+      ]
+    },
+    "LG": {
+      "title": "Logging, monitoring and error handling",
+      "controls": [
+        {
+          "control_id": "LG-01",
+          "statement": "Authentication events (success, failure, lockout, reset) and authorization failures are logged with who, what, when and source.",
+          "standards": {
+            "cwe": [
+              "CWE-778"
+            ],
+            "owasp_top10": [
+              "A09:2025"
+            ],
+            "owasp_asvs": [
+              "v5.0.0-16.3.1",
+              "v5.0.0-16.3.2",
+              "v5.0.0-16.2.1"
+            ],
+            "iso27001": [
+              "A.8.15"
+            ]
+          }
+        },
+        {
+          "control_id": "LG-02",
+          "statement": "Security-relevant administrative actions (role changes, user management, configuration, bulk import, export or delete) leave an audit trail.",
+          "standards": {
+            "cwe": [
+              "CWE-778"
+            ],
+            "owasp_top10": [
+              "A09:2025"
+            ],
+            "owasp_asvs": [
+              "v5.0.0-16.3.3"
+            ],
+            "iso27001": [
+              "A.8.15",
+              "A.5.28"
+            ]
+          }
+        },
+        {
+          "control_id": "LG-03",
+          "statement": "Logs never contain passwords, session tokens, secrets or full personal data, and logged input is encoded against log injection.",
+          "standards": {
+            "cwe": [
+              "CWE-532",
+              "CWE-117"
+            ],
+            "owasp_top10": [
+              "A09:2025"
+            ],
+            "owasp_asvs": [
+              "v5.0.0-16.2.5",
+              "v5.0.0-16.4.1"
+            ],
+            "iso27001": [
+              "A.8.15",
+              "A.8.11"
+            ]
+          }
+        },
+        {
+          "control_id": "LG-04",
+          "statement": "Errors return a generic message to clients; stack traces, queries, file paths and component versions are not exposed outside development.",
+          "standards": {
+            "cwe": [
+              "CWE-209"
+            ],
+            "owasp_top10": [
+              "A10:2025"
+            ],
+            "owasp_asvs": [
+              "v5.0.0-16.5.1",
+              "v5.0.0-13.4.6"
+            ],
+            "iso27001": [
+              "A.8.26"
+            ]
+          }
+        },
+        {
+          "control_id": "LG-05",
+          "statement": "Security controls fail closed: an exception, timeout or unavailable dependency inside an authentication, authorization, validation or integrity check denies the operation, and a last-resort handler catches unhandled errors.",
+          "standards": {
+            "cwe": [
+              "CWE-636",
+              "CWE-248"
+            ],
+            "owasp_top10": [
+              "A10:2025"
+            ],
+            "owasp_asvs": [
+              "v5.0.0-16.5.2",
+              "v5.0.0-16.5.3",
+              "v5.0.0-16.5.4"
+            ],
+            "iso27001": [
+              "A.8.27",
+              "A.8.28"
+            ]
+          }
+        },
+        {
+          "control_id": "LG-06",
+          "statement": "Logs are protected from modification and unauthorized reading, are retained or shipped so incidents can be investigated, and security events raise alerts.",
+          "standards": {
+            "owasp_top10": [
+              "A09:2025"
+            ],
+            "owasp_asvs": [
+              "v5.0.0-16.4.2",
+              "v5.0.0-16.4.3"
+            ],
+            "iso27001": [
+              "A.8.15",
+              "A.8.16"
+            ]
+          }
+        }
+      ]
+    },
+    "SC": {
+      "title": "Supply chain and build",
+      "controls": [
+        {
+          "control_id": "SC-01",
+          "statement": "Every dependency is pinned by a committed lockfile, and CI and image builds install from the lockfile rather than from floating ranges.",
+          "standards": {
+            "cwe": [
+              "CWE-1357"
+            ],
+            "owasp_top10": [
+              "A03:2025"
+            ],
+            "owasp_asvs": [
+              "v5.0.0-15.1.2",
+              "v5.0.0-15.2.4"
+            ],
+            "iso27001": [
+              "A.8.8",
+              "A.5.21"
+            ]
+          }
+        },
+        {
+          "control_id": "SC-02",
+          "statement": "Dependencies are kept free of known vulnerabilities and inside their support window: an audit or update tool runs in CI or on a schedule, and its findings block or are tracked.",
+          "standards": {
+            "cwe": [
+              "CWE-1395",
+              "CWE-1104"
+            ],
+            "owasp_top10": [
+              "A03:2025"
+            ],
+            "owasp_asvs": [
+              "v5.0.0-15.1.1",
+              "v5.0.0-15.2.1"
+            ],
+            "iso27001": [
+              "A.8.8"
+            ]
+          }
+        },
+        {
+          "control_id": "SC-03",
+          "statement": "CI workflows use least-privilege tokens, pin third-party actions to a commit or exact version, and do not run untrusted pull-request code with secrets.",
+          "standards": {
+            "cwe": [
+              "CWE-829"
+            ],
+            "owasp_top10": [
+              "A03:2025",
+              "A08:2025"
+            ],
+            "owasp_asvs": [
+              "v5.0.0-15.2.4"
+            ],
+            "iso27001": [
+              "A.8.25",
+              "A.5.21"
+            ]
+          }
+        },
+        {
+          "control_id": "SC-04",
+          "statement": "Container and base images are pinned to an exact version or digest from a trusted registry, and the build context excludes secrets and local state.",
+          "standards": {
+            "cwe": [
+              "CWE-829"
+            ],
+            "owasp_top10": [
+              "A03:2025"
+            ],
+            "owasp_asvs": [
+              "v5.0.0-15.2.4"
+            ],
+            "iso27001": [
+              "A.8.9",
+              "A.5.21"
+            ]
+          }
+        },
+        {
+          "control_id": "SC-05",
+          "statement": "Build, release and deploy steps verify what they ship: artifacts come from the reviewed revision, and install or update scripts check integrity before running fetched code.",
+          "standards": {
+            "cwe": [
+              "CWE-494"
+            ],
+            "owasp_top10": [
+              "A08:2025"
+            ],
+            "iso27001": [
+              "A.8.19",
+              "A.8.32"
+            ]
+          }
+        }
+      ]
+    },
+    "SD": {
+      "title": "Secure development and environment separation",
+      "controls": [
+        {
+          "control_id": "SD-01",
+          "statement": "Changes reach the main branch through review and automated checks (tests, static analysis, linting) that the repository enforces or documents.",
+          "standards": {
+            "owasp_top10": [
+              "A06:2025"
+            ],
+            "iso27001": [
+              "A.8.4",
+              "A.8.25",
+              "A.8.29",
+              "A.8.32"
+            ]
+          }
+        },
+        {
+          "control_id": "SD-02",
+          "statement": "Security-relevant behaviour has automated tests: authorization failures, validation rejections, and regression tests for past security fixes.",
+          "standards": {
+            "owasp_top10": [
+              "A06:2025"
+            ],
+            "iso27001": [
+              "A.8.29"
+            ]
+          }
+        },
+        {
+          "control_id": "SD-03",
+          "statement": "Development, test and production are separated: distinct credentials and configuration, and development-only tooling and seeders cannot run against production by default.",
+          "standards": {
+            "owasp_top10": [
+              "A02:2025"
+            ],
+            "owasp_asvs": [
+              "v5.0.0-15.2.3"
+            ],
+            "iso27001": [
+              "A.8.31"
+            ]
+          }
+        },
+        {
+          "control_id": "SD-04",
+          "statement": "Security documentation exists and matches the code: how to report a vulnerability, how secrets are provisioned, which roles exist and what each may do.",
+          "standards": {
+            "owasp_top10": [
+              "A06:2025"
+            ],
+            "owasp_asvs": [
+              "v5.0.0-6.1.1",
+              "v5.0.0-8.1.1"
+            ],
+            "iso27001": [
+              "A.5.37",
+              "A.5.15"
+            ]
+          }
+        }
+      ]
+    },
+    "AV": {
+      "title": "Availability and abuse limits",
+      "controls": [
+        {
+          "control_id": "AV-01",
+          "statement": "Expensive or state-changing operations open to users (search, export, import, generation, mail sending) are bounded by rate limits, quotas, pagination or size limits.",
+          "standards": {
+            "cwe": [
+              "CWE-770",
+              "CWE-799"
+            ],
+            "owasp_top10": [
+              "A06:2025"
+            ],
+            "owasp_asvs": [
+              "v5.0.0-2.4.1",
+              "v5.0.0-15.2.2"
+            ],
+            "iso27001": [
+              "A.8.6"
+            ]
+          }
+        },
+        {
+          "control_id": "AV-02",
+          "statement": "Long-running or resource-heavy work started by a request runs with timeouts and concurrency control, so one user cannot starve others or start conflicting jobs.",
+          "standards": {
+            "cwe": [
+              "CWE-770",
+              "CWE-362"
+            ],
+            "owasp_top10": [
+              "A06:2025",
+              "A10:2025"
+            ],
+            "owasp_asvs": [
+              "v5.0.0-15.2.2"
+            ],
+            "iso27001": [
+              "A.8.6"
+            ]
+          }
+        },
+        {
+          "control_id": "AV-03",
+          "statement": "Business operations that must be atomic use transactions or locks, so a partial failure or concurrent requests cannot leave inconsistent state.",
+          "standards": {
+            "cwe": [
+              "CWE-362",
+              "CWE-367"
+            ],
+            "owasp_top10": [
+              "A06:2025"
+            ],
+            "owasp_asvs": [
+              "v5.0.0-2.3.3",
+              "v5.0.0-2.3.4"
+            ],
+            "iso27001": [
+              "A.8.27"
+            ]
+          }
+        }
+      ]
+    }
+  }
+}

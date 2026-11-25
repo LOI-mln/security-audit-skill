@@ -1,5 +1,5 @@
 {
-  "$comment": "Top-level contract for findings.json. validate-findings.cjs interprets and checks this schema directly.",
+  "$comment": "Top-level contract for findings.json. validate-findings.cjs interprets and checks this schema directly. The optional standards object becomes mandatory on confirmed and needs_validation records when the validator runs with --require-standards.",
   "type": "array",
   "items": {
     "oneOf": [
@@ -26,6 +26,53 @@
             "type": "string",
             "minLength": 1,
             "visibleContent": true
+          },
+          "standards": {
+            "type": "object",
+            "description": "Classification against published standards. Never evidence: it does not change a verdict or a severity. validate-findings.cjs also checks that every identifier exists.",
+            "properties": {
+              "cwe": {
+                "type": "array",
+                "description": "MITRE CWE weaknesses, most specific first. Views, categories and pillars are rejected.",
+                "minItems": 1,
+                "uniqueItems": true,
+                "items": {
+                  "type": "string",
+                  "pattern": "^CWE-[1-9][0-9]{0,4}$"
+                }
+              },
+              "owasp_top10": {
+                "type": "array",
+                "description": "OWASP Top 10 categories, for example A01:2025.",
+                "minItems": 1,
+                "uniqueItems": true,
+                "items": {
+                  "type": "string",
+                  "pattern": "^A(0[1-9]|10):(2021|2025)$"
+                }
+              },
+              "owasp_asvs": {
+                "type": "array",
+                "description": "OWASP ASVS 5.0.0 sections or requirements, for example v5.0.0-8.2 or v5.0.0-8.2.2.",
+                "minItems": 1,
+                "uniqueItems": true,
+                "items": {
+                  "type": "string",
+                  "pattern": "^v5\\.0\\.0-[1-9][0-9]?\\.[1-9][0-9]?(\\.[1-9][0-9]?)?$"
+                }
+              },
+              "iso27001": {
+                "type": "array",
+                "description": "ISO/IEC 27001:2022 Annex A controls, for example A.8.28.",
+                "minItems": 1,
+                "uniqueItems": true,
+                "items": {
+                  "type": "string",
+                  "pattern": "^A\\.[5-8]\\.[1-9][0-9]?$"
+                }
+              }
+            },
+            "additionalProperties": false
           },
           "root_cause": {
             "type": "string",
@@ -266,6 +313,53 @@
             "minLength": 1,
             "visibleContent": true
           },
+          "standards": {
+            "type": "object",
+            "description": "Classification against published standards. Never evidence: it does not change a verdict or a severity. validate-findings.cjs also checks that every identifier exists.",
+            "properties": {
+              "cwe": {
+                "type": "array",
+                "description": "MITRE CWE weaknesses, most specific first. Views, categories and pillars are rejected.",
+                "minItems": 1,
+                "uniqueItems": true,
+                "items": {
+                  "type": "string",
+                  "pattern": "^CWE-[1-9][0-9]{0,4}$"
+                }
+              },
+              "owasp_top10": {
+                "type": "array",
+                "description": "OWASP Top 10 categories, for example A01:2025.",
+                "minItems": 1,
+                "uniqueItems": true,
+                "items": {
+                  "type": "string",
+                  "pattern": "^A(0[1-9]|10):(2021|2025)$"
+                }
+              },
+              "owasp_asvs": {
+                "type": "array",
+                "description": "OWASP ASVS 5.0.0 sections or requirements, for example v5.0.0-8.2 or v5.0.0-8.2.2.",
+                "minItems": 1,
+                "uniqueItems": true,
+                "items": {
+                  "type": "string",
+                  "pattern": "^v5\\.0\\.0-[1-9][0-9]?\\.[1-9][0-9]?(\\.[1-9][0-9]?)?$"
+                }
+              },
+              "iso27001": {
+                "type": "array",
+                "description": "ISO/IEC 27001:2022 Annex A controls, for example A.8.28.",
+                "minItems": 1,
+                "uniqueItems": true,
+                "items": {
+                  "type": "string",
+                  "pattern": "^A\\.[5-8]\\.[1-9][0-9]?$"
+                }
+              }
+            },
+            "additionalProperties": false
+          },
           "claimed_root_cause": {
             "type": "string",
             "minLength": 1,
@@ -382,6 +476,53 @@
             "type": "string",
             "minLength": 1,
             "visibleContent": true
+          },
+          "standards": {
+            "type": "object",
+            "description": "Classification against published standards. Never evidence: it does not change a verdict or a severity. validate-findings.cjs also checks that every identifier exists.",
+            "properties": {
+              "cwe": {
+                "type": "array",
+                "description": "MITRE CWE weaknesses, most specific first. Views, categories and pillars are rejected.",
+                "minItems": 1,
+                "uniqueItems": true,
+                "items": {
+                  "type": "string",
+                  "pattern": "^CWE-[1-9][0-9]{0,4}$"
+                }
+              },
+              "owasp_top10": {
+                "type": "array",
+                "description": "OWASP Top 10 categories, for example A01:2025.",
+                "minItems": 1,
+                "uniqueItems": true,
+                "items": {
+                  "type": "string",
+                  "pattern": "^A(0[1-9]|10):(2021|2025)$"
+                }
+              },
+              "owasp_asvs": {
+                "type": "array",
+                "description": "OWASP ASVS 5.0.0 sections or requirements, for example v5.0.0-8.2 or v5.0.0-8.2.2.",
+                "minItems": 1,
+                "uniqueItems": true,
+                "items": {
+                  "type": "string",
+                  "pattern": "^v5\\.0\\.0-[1-9][0-9]?\\.[1-9][0-9]?(\\.[1-9][0-9]?)?$"
+                }
+              },
+              "iso27001": {
+                "type": "array",
+                "description": "ISO/IEC 27001:2022 Annex A controls, for example A.8.28.",
+                "minItems": 1,
+                "uniqueItems": true,
+                "items": {
+                  "type": "string",
+                  "pattern": "^A\\.[5-8]\\.[1-9][0-9]?$"
+                }
+              }
+            },
+            "additionalProperties": false
           },
           "claimed_root_cause": {
             "type": "string",

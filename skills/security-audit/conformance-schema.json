@@ -1,0 +1,440 @@
+{
+  "$comment": "Top-level contract for conformance.json. validate-conformance.cjs interprets this schema with the same interpreter as report-schema.json and adds checklist and identifier checks. A conformance record states whether a control is visible in source. It is not a vulnerability record: it has no verdict, no severity and no reproduction.",
+  "type": "array",
+  "items": {
+    "oneOf": [
+      {
+        "type": "object",
+        "description": "The control is implemented and the source shows where.",
+        "properties": {
+          "control_id": {
+            "type": "string",
+            "pattern": "^([A-Z]{2}-[0-9]{2}|X-[A-Z0-9][A-Z0-9-]{0,23})$"
+          },
+          "status": {
+            "type": "string",
+            "const": "met"
+          },
+          "title": {
+            "type": "string",
+            "minLength": 1,
+            "visibleContent": true
+          },
+          "summary": {
+            "type": "string",
+            "minLength": 1,
+            "visibleContent": true
+          },
+          "evidence": {
+            "type": "array",
+            "minItems": 1,
+            "uniqueItems": true,
+            "items": {
+              "type": "object",
+              "properties": {
+                "file": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "line": {
+                  "type": "integer",
+                  "minimum": 1
+                },
+                "description": {
+                  "type": "string",
+                  "minLength": 1,
+                  "visibleContent": true
+                }
+              },
+              "required": ["file", "line", "description"],
+              "additionalProperties": false
+            }
+          },
+          "standards": {
+            "type": "object",
+            "properties": {
+              "cwe": {
+                "type": "array",
+                "minItems": 1,
+                "uniqueItems": true,
+                "items": {
+                  "type": "string",
+                  "pattern": "^CWE-[1-9][0-9]{0,4}$"
+                }
+              },
+              "owasp_top10": {
+                "type": "array",
+                "minItems": 1,
+                "uniqueItems": true,
+                "items": {
+                  "type": "string",
+                  "pattern": "^A(0[1-9]|10):(2021|2025)$"
+                }
+              },
+              "owasp_asvs": {
+                "type": "array",
+                "minItems": 1,
+                "uniqueItems": true,
+                "items": {
+                  "type": "string",
+                  "pattern": "^v5\\.0\\.0-[1-9][0-9]?\\.[1-9][0-9]?(\\.[1-9][0-9]?)?$"
+                }
+              },
+              "iso27001": {
+                "type": "array",
+                "minItems": 1,
+                "uniqueItems": true,
+                "items": {
+                  "type": "string",
+                  "pattern": "^A\\.[5-8]\\.[1-9][0-9]?$"
+                }
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "required": ["control_id", "status", "title", "summary", "evidence"],
+        "additionalProperties": false
+      },
+      {
+        "type": "object",
+        "description": "The control is absent or incomplete, and the source shows it. A gap is hardening work, not a demonstrated vulnerability.",
+        "properties": {
+          "control_id": {
+            "type": "string",
+            "pattern": "^([A-Z]{2}-[0-9]{2}|X-[A-Z0-9][A-Z0-9-]{0,23})$"
+          },
+          "status": {
+            "type": "string",
+            "const": "gap"
+          },
+          "title": {
+            "type": "string",
+            "minLength": 1,
+            "visibleContent": true
+          },
+          "summary": {
+            "type": "string",
+            "minLength": 1,
+            "visibleContent": true
+          },
+          "evidence": {
+            "type": "array",
+            "minItems": 1,
+            "uniqueItems": true,
+            "items": {
+              "type": "object",
+              "properties": {
+                "file": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "line": {
+                  "type": "integer",
+                  "minimum": 1
+                },
+                "description": {
+                  "type": "string",
+                  "minLength": 1,
+                  "visibleContent": true
+                }
+              },
+              "required": ["file", "line", "description"],
+              "additionalProperties": false
+            }
+          },
+          "remediation": {
+            "type": "object",
+            "properties": {
+              "strategy": {
+                "type": "string",
+                "minLength": 1,
+                "visibleContent": true
+              },
+              "code_changes": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "file_name": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "fixed_code": {
+                      "type": "string"
+                    }
+                  },
+                  "required": ["file_name", "fixed_code"],
+                  "additionalProperties": false
+                }
+              }
+            },
+            "required": ["strategy"],
+            "additionalProperties": false
+          },
+          "priority": {
+            "type": "object",
+            "description": "Order of work for hardening. Not a severity: no boundary failure was demonstrated.",
+            "properties": {
+              "level": {
+                "type": "string",
+                "enum": ["high", "medium", "low"]
+              },
+              "reason": {
+                "type": "string",
+                "minLength": 1,
+                "visibleContent": true
+              }
+            },
+            "required": ["level", "reason"],
+            "additionalProperties": false
+          },
+          "related_fingerprints": {
+            "type": "array",
+            "description": "Fingerprints of findings.json records with the same root cause, so the fix is planned once.",
+            "minItems": 1,
+            "uniqueItems": true,
+            "items": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9._:/@+-]*$"
+            }
+          },
+          "standards": {
+            "type": "object",
+            "properties": {
+              "cwe": {
+                "type": "array",
+                "minItems": 1,
+                "uniqueItems": true,
+                "items": {
+                  "type": "string",
+                  "pattern": "^CWE-[1-9][0-9]{0,4}$"
+                }
+              },
+              "owasp_top10": {
+                "type": "array",
+                "minItems": 1,
+                "uniqueItems": true,
+                "items": {
+                  "type": "string",
+                  "pattern": "^A(0[1-9]|10):(2021|2025)$"
+                }
+              },
+              "owasp_asvs": {
+                "type": "array",
+                "minItems": 1,
+                "uniqueItems": true,
+                "items": {
+                  "type": "string",
+                  "pattern": "^v5\\.0\\.0-[1-9][0-9]?\\.[1-9][0-9]?(\\.[1-9][0-9]?)?$"
+                }
+              },
+              "iso27001": {
+                "type": "array",
+                "minItems": 1,
+                "uniqueItems": true,
+                "items": {
+                  "type": "string",
+                  "pattern": "^A\\.[5-8]\\.[1-9][0-9]?$"
+                }
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "required": ["control_id", "status", "title", "summary", "evidence", "remediation", "priority"],
+        "additionalProperties": false
+      },
+      {
+        "type": "object",
+        "description": "The target has no surface the control governs.",
+        "properties": {
+          "control_id": {
+            "type": "string",
+            "pattern": "^([A-Z]{2}-[0-9]{2}|X-[A-Z0-9][A-Z0-9-]{0,23})$"
+          },
+          "status": {
+            "type": "string",
+            "const": "not_applicable"
+          },
+          "title": {
+            "type": "string",
+            "minLength": 1,
+            "visibleContent": true
+          },
+          "reason": {
+            "type": "string",
+            "minLength": 1,
+            "visibleContent": true
+          },
+          "evidence": {
+            "type": "array",
+            "uniqueItems": true,
+            "items": {
+              "type": "object",
+              "properties": {
+                "file": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "line": {
+                  "type": "integer",
+                  "minimum": 1
+                },
+                "description": {
+                  "type": "string",
+                  "minLength": 1,
+                  "visibleContent": true
+                }
+              },
+              "required": ["file", "line", "description"],
+              "additionalProperties": false
+            }
+          },
+          "standards": {
+            "type": "object",
+            "properties": {
+              "cwe": {
+                "type": "array",
+                "minItems": 1,
+                "uniqueItems": true,
+                "items": {
+                  "type": "string",
+                  "pattern": "^CWE-[1-9][0-9]{0,4}$"
+                }
+              },
+              "owasp_top10": {
+                "type": "array",
+                "minItems": 1,
+                "uniqueItems": true,
+                "items": {
+                  "type": "string",
+                  "pattern": "^A(0[1-9]|10):(2021|2025)$"
+                }
+              },
+              "owasp_asvs": {
+                "type": "array",
+                "minItems": 1,
+                "uniqueItems": true,
+                "items": {
+                  "type": "string",
+                  "pattern": "^v5\\.0\\.0-[1-9][0-9]?\\.[1-9][0-9]?(\\.[1-9][0-9]?)?$"
+                }
+              },
+              "iso27001": {
+                "type": "array",
+                "minItems": 1,
+                "uniqueItems": true,
+                "items": {
+                  "type": "string",
+                  "pattern": "^A\\.[5-8]\\.[1-9][0-9]?$"
+                }
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "required": ["control_id", "status", "title", "reason"],
+        "additionalProperties": false
+      },
+      {
+        "type": "object",
+        "description": "Source cannot settle the control: the deciding fact is a deployment, organizational or runtime fact, or the family was not reviewed in this run.",
+        "properties": {
+          "control_id": {
+            "type": "string",
+            "pattern": "^([A-Z]{2}-[0-9]{2}|X-[A-Z0-9][A-Z0-9-]{0,23})$"
+          },
+          "status": {
+            "type": "string",
+            "const": "not_assessed"
+          },
+          "title": {
+            "type": "string",
+            "minLength": 1,
+            "visibleContent": true
+          },
+          "reason": {
+            "type": "string",
+            "minLength": 1,
+            "visibleContent": true
+          },
+          "owner_check": {
+            "type": "string",
+            "description": "What the owner can look at to settle it. Never an instruction to probe a live system.",
+            "minLength": 1,
+            "visibleContent": true
+          },
+          "evidence": {
+            "type": "array",
+            "uniqueItems": true,
+            "items": {
+              "type": "object",
+              "properties": {
+                "file": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "line": {
+                  "type": "integer",
+                  "minimum": 1
+                },
+                "description": {
+                  "type": "string",
+                  "minLength": 1,
+                  "visibleContent": true
+                }
+              },
+              "required": ["file", "line", "description"],
+              "additionalProperties": false
+            }
+          },
+          "standards": {
+            "type": "object",
+            "properties": {
+              "cwe": {
+                "type": "array",
+                "minItems": 1,
+                "uniqueItems": true,
+                "items": {
+                  "type": "string",
+                  "pattern": "^CWE-[1-9][0-9]{0,4}$"
+                }
+              },
+              "owasp_top10": {
+                "type": "array",
+                "minItems": 1,
+                "uniqueItems": true,
+                "items": {
+                  "type": "string",
+                  "pattern": "^A(0[1-9]|10):(2021|2025)$"
+                }
+              },
+              "owasp_asvs": {
+                "type": "array",
+                "minItems": 1,
+                "uniqueItems": true,
+                "items": {
+                  "type": "string",
+                  "pattern": "^v5\\.0\\.0-[1-9][0-9]?\\.[1-9][0-9]?(\\.[1-9][0-9]?)?$"
+                }
+              },
+              "iso27001": {
+                "type": "array",
+                "minItems": 1,
+                "uniqueItems": true,
+                "items": {
+                  "type": "string",
+                  "pattern": "^A\\.[5-8]\\.[1-9][0-9]?$"
+                }
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "required": ["control_id", "status", "title", "reason", "owner_check"],
+        "additionalProperties": false
+      }
+    ]
+  }
+}

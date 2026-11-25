@@ -4,7 +4,7 @@
 
 After the clean coverage-critic pass or an explicitly recorded early stop, consolidate Phase 2 candidates and carried same-source prior confirmations by stable fingerprint and root cause. Give every unique proposed `confirmed` and `needs_validation` candidate to a fresh `general` verifier that did not hunt it. A carried prior confirmation follows the same current verification path even though hunters exclude that unchanged root cause. A verifier may read hunter or prior artifacts but must re-read every cited current source location and independently run any decisive check it can reproduce safely.
 
-Assign each verifier a canonical lowercase unique ID and `<output-dir>/agents/<verifier-id>/scratch/` plus parent-owned `artifacts/`. The verifier writes only to `scratch/` and never writes retained artifacts. It receives only the candidate, its linked coverage-unit checks and artifact paths, architecture facts needed to interpret the path, exact relevant companion validation blocks, the promotion procedure block below, the source/local execution boundary, the `confirmed`, `needs_validation`, and `rejected` branches of `report-schema.json` copied verbatim, and prior records with the same fingerprint. It must not receive another verifier's conclusion.
+Assign each verifier a canonical lowercase unique ID and `<output-dir>/agents/<verifier-id>/scratch/` plus parent-owned `artifacts/`. The verifier writes only to `scratch/` and never writes retained artifacts. It receives only the candidate, its linked coverage-unit checks and artifact paths, architecture facts needed to interpret the path, exact relevant companion validation blocks, the `Core discipline` block and relevant crosswalk rows of [STANDARDS.md](STANDARDS.md), the promotion procedure block below, the source/local execution boundary, the `confirmed`, `needs_validation`, and `rejected` branches of `report-schema.json` copied verbatim, and prior records with the same fingerprint. It must not receive another verifier's conclusion.
 
 #### Candidate-verifier prompt
 
@@ -38,6 +38,10 @@ unavailable or fails, do not use that file as evidence.
    missing fact remains decisive, keep needs_validation and make the local and
    owner-observed plans exact and non-destructive.
 6. Preserve the fingerprint for the same source-derived root cause across every state.
+7. Check the standards mapping against the standards discipline and crosswalk rows in
+   this prompt: the first CWE names the root cause, every identifier comes from those
+   rows, and the mapping did not influence verdict or severity. Correct it in the
+   record you return.
 
 Return exactly one JSON object and no surrounding prose:
 {"decision": "confirmed|needs_validation|rejected", "record": { ... }}
@@ -111,11 +115,12 @@ Every record has a stable fingerprint, title, description, and repository-relati
 Run:
 
 ```sh
-node <skill-dir>/validate-findings.cjs <output-dir>/findings.json
+node <skill-dir>/validate-findings.cjs --require-standards <output-dir>/findings.json
 node <skill-dir>/validate-coverage-ledger.cjs <output-dir>/coverage-ledger.json
+node <skill-dir>/validate-conformance.cjs --findings <output-dir>/findings.json <output-dir>/conformance.json
 ```
 
-Fix every structural and semantic error before continuing. The findings validator rejects input beyond 5 MiB, 1,000 top-level findings, or 64 nesting levels, and caps reported error output at 100 messages. Validator success proves format and ledger consistency only.
+Every `confirmed` and `needs_validation` record carries `standards` with at least one CWE and one framework reference; `--require-standards` enforces it and rejects identifiers that `standards-index.json` does not contain. Classify a carried prior record that predates the field now; that changes its classification, not its evidence. Fix every structural and semantic error before continuing. The findings validator rejects input beyond 5 MiB, 1,000 top-level findings, or 64 nesting levels, and caps reported error output at 100 messages. Validator success proves format, identifier existence and ledger consistency only; it does not prove that a mapping is the right one.
 
 ### Phase 5: Verify the final records with fresh eyes
 
@@ -131,6 +136,7 @@ For `confirmed`, require it to check:
 4. Affected principal/resource and demonstrated impact.
 5. Severity separation: realistic likelihood, demonstrated impact, overall no greater than impact.
 6. Remediation strategy and any `code_changes`, including whether the fix enforces the invariant without merely moving trust.
+7. The `standards` mapping, by the validation rules in [STANDARDS.md](STANDARDS.md).
 
 For `needs_validation`, require it to check:
 
@@ -139,18 +145,19 @@ For `needs_validation`, require it to check:
 3. The candidate names a boundary and a possible concrete result rather than a generic concern.
 4. At least one validation-plan field is present and exact. `local` uses a bounded fixture; `deployment` asks an owner to observe a configuration, identity, route, policy, or runtime fact. Do not invent a plan for an inapplicable context, and never send audit traffic to a deployment.
 5. The fingerprint matches prior/current records for the same root cause.
+6. The `standards` mapping names the claimed root cause, by the validation rules in [STANDARDS.md](STANDARDS.md).
 
 Each verifier returns exactly one JSON object: `{"decision":"verified","fingerprint":"..."}` or `{"decision":"replace","reason":"...","record":{...}}`, with no surrounding prose. A replacement record must match its `confirmed`, `needs_validation`, or `rejected` schema branch. Treat a malformed or prose-wrapped Phase 5 result the same way as in Phase 3: discard it without repairing it and re-run with a fresh verifier when the budget permits.
 
-Do not apply a Phase 5 replacement as final when it promotes a record to a stronger verdict, including any promotion to `confirmed`, or materially changes the root cause, trace, execution input or observed result, demonstrated impact, or severity. Give that complete replacement to a new independent verifier that did not hunt, perform Phase 3 validation, or propose the Phase 5 replacement. The new verifier rechecks the current source and independently reproduces any decisive local result under the execution boundary, then returns `verified` or another replacement. Apply a material replacement only after this fresh verification. If another material replacement results, repeat with a fresh verifier. If budget or independence is unavailable, remove the disputed record from `findings.json`, keep its ledger unit as an unresolved candidate, and set `run_status: "incomplete"` with an exact `incomplete_reason`. Non-material wording or repository-line corrections may be applied directly when they do not change meaning or evidence.
+Do not apply a Phase 5 replacement as final when it promotes a record to a stronger verdict, including any promotion to `confirmed`, or materially changes the root cause, trace, execution input or observed result, demonstrated impact, or severity. Give that complete replacement to a new independent verifier that did not hunt, perform Phase 3 validation, or propose the Phase 5 replacement. The new verifier rechecks the current source and independently reproduces any decisive local result under the execution boundary, then returns `verified` or another replacement. Apply a material replacement only after this fresh verification. If another material replacement results, repeat with a fresh verifier. If budget or independence is unavailable, remove the disputed record from `findings.json`, keep its ledger unit as an unresolved candidate, and set `run_status: "incomplete"` with an exact `incomplete_reason`. Non-material wording, repository-line, or standards-mapping corrections may be applied directly when they do not change meaning or evidence.
 
-After every applied replacement, rerun both validators and update linked ledger decisions. If a final verifier identifies a separate root cause, assign a new fingerprint and send it through independent candidate validation before inclusion. Set `run_status: "complete"` only when every ledger candidate has an independent final disposition and every retained record passes Phase 5.
+After every applied replacement, rerun the validators and update linked ledger decisions and any `related_fingerprints` in `conformance.json`. If a final verifier identifies a separate root cause, assign a new fingerprint and send it through independent candidate validation before inclusion. Set `run_status: "complete"` only when every ledger candidate has an independent final disposition and every retained record passes Phase 5.
 
 Do not verify only `confirmed` records. A misleading `needs_validation` handoff wastes owner time and can preserve a false premise.
 
 ### Phase 6: Produce target-neutral reports from final records
 
-Only after Phase 5 passes for every record retained in `findings.json`, derive prose from the final records, the ledger, and the hunter `hardening` notes retained in ledger bookkeeping. An incomplete run may report independently verified records, but it must identify each unresolved ledger candidate and must not present it as a finding. The prose files never change a verdict, severity, blocker, or demonstrated impact.
+Only after Phase 5 passes for every record retained in `findings.json`, derive prose from the final records, the ledger, `conformance.json`, and the hunter `hardening` notes retained in ledger bookkeeping. An incomplete run may report independently verified records, but it must identify each unresolved ledger candidate and must not present it as a finding. The prose files never change a verdict, severity, blocker, or demonstrated impact.
 
 #### `REPORT.md`
 
@@ -159,10 +166,11 @@ Write:
 1. Run profile, scope, budget (if set) with agents spent versus planned, source ref, sandboxed source-and-local-only execution statement, prior-run use, and explicit deferred and out-of-scope coverage. Name carried same-source confirmations and changed-source revalidations. A `quick`, scoped, budget-limited, or incomplete run states plainly that it is a partial pass. If candidate validation exhausted a strict budget, state that the run is incomplete and list every unvalidated fingerprint and linked unit; do not describe those candidates as findings. If the budget prevented a mandatory critic, state which critic did not run and make no clean-coverage claim.
 2. One short security posture summary.
 3. A confirmed-findings table: severity, title, affected boundary, and one-line observed result.
-4. Each confirmed finding: repository source location, lower-trust principal, target-native bounded reproduction, conditions, actual result, impact, priority rationale, and smallest source fix.
+4. Each confirmed finding: repository source location, standards references, lower-trust principal, target-native bounded reproduction, conditions, actual result, impact, priority rationale, and smallest source fix.
 5. A separate `NEEDS VALIDATION` table. Give each lead's title, repository trace, exact blocker, bounded local next step, and safe owner-observed deployment check. Do not assign severity or call it a confirmed vulnerability.
-6. Separate hardening notes and positive source patterns.
+6. Separate hardening notes and positive source patterns. Refer to the conformance gaps by control identifier instead of repeating them.
 7. Coverage summary from the ledger: covered, candidate, blocked, and deferred counts, plus important exclusions and the final critic result.
+8. A standards summary: the standards and editions used, one line per OWASP Top 10:2025 category with its confirmed, needs-validation and conformance-gap counts, the conformance totals (met, gap, not applicable, not assessed), and a pointer to `STANDARDS-REPORT.md` and `REMEDIATION.md`. State that a source review gives evidence relevant to a standard and certifies nothing.
 
 Do not describe rejected records as findings. Mention their fingerprints only when they explain a prior disagreement or coverage decision.
 
@@ -181,6 +189,22 @@ For each confirmed `medium`, `high`, or `critical` record, copy the complete sou
 
 For every unresolved record, copy the source trace, verified evidence, exact blocker, affected boundary, and each applicable bounded local or owner-observed resolution plan. Keep these as prioritized leads without severity. Do not turn them into live test guidance or assume the missing deployment fact.
 
+#### `STANDARDS-REPORT.md`
+
+Derive it from `findings.json`, `conformance.json` and `conformance-checklist.json`. It reports classification and control coverage; it changes no verdict, severity or priority.
+
+1. Standards and editions used, and how any loosely named standard in the request was resolved.
+2. The limits listed under "What this review cannot say" in [STANDARDS-CONFORMANCE.md](STANDARDS-CONFORMANCE.md), before any table.
+3. OWASP Top 10:2025: one row per category A01 to A10 with the number of confirmed findings, needs-validation leads, conformance gaps, controls met and controls not assessed, followed by the fingerprints and control identifiers behind each number. Add the 2021 category in a second column. A category with no record and no reviewed control reads "not reviewed", never "clean".
+4. OWASP ASVS 5.0.0: one row per chapter with controls met, gap, not applicable and not assessed, and the requirement identifiers involved. Name the chapters the checklist does not reach.
+5. ISO/IEC 27001:2022 Annex A: one row per control cited, with the records and checklist controls relevant to it, worded as evidence relevant to the control.
+6. CWE: each weakness cited, with its records.
+7. Conformance detail: for every `gap`, the control statement, evidence, priority and fix; for every `not_assessed`, the missing fact and the owner check; for `not_applicable`, the excluding fact in one line.
+
 HTTP is one possible native interface, not the default. A library finding may use a function call, a parser a fixture, a CLI a command, a desktop app an IPC or file action, and infrastructure a locally rendered policy. Do not require an endpoint, external account, or live environment that the target does not have.
 
 Keep the report proportional to the evidence. A clean run may have zero confirmed records. State that result and the remaining coverage/validation limits without inventing LOW findings.
+
+### Phase 7: Write the remediation handoff
+
+After the Phase 6 files exist, write `<output-dir>/REMEDIATION.md` by following [REMEDIATION-HANDOFF.md](REMEDIATION-HANDOFF.md). It turns each `confirmed` record and each conformance `gap` into one ordered, self-contained task, lists `needs_validation` records and `not_assessed` controls as decisions for the owner, and gives the fixer its working rules. It is derived from the same final records as the reports and adds no claim of its own. The run reaches its complete terminal state only when this file is written and its task and decision lists account for every reported record exactly once.

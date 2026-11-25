@@ -52,6 +52,7 @@ Read tests, build definitions, manifests, packaging, and maintained environment 
 5. The final active source path for each deployment mode only where the repository selects it deterministically.
 6. Whether the local platform can enforce an empty allowlisted environment, no external network, read-only target/toolchain mounts, scratch-only writes, and explicit CPU, memory, process, file-size, disk, and wall-clock limits. Missing controls block target-controlled execution.
 7. Whether trusted parent-side code can promote predeclared scratch files with path-confined no-follow descriptor traversal, nonblocking regular-file checks, no-follow traversal of every destination parent, exclusive regular-file destination creation, and explicit per-file and cumulative size bounds. Missing promotion controls block use of scratch files as evidence.
+8. Which container runtime responds locally and which local images already hold the target's toolchain, for `sandbox-run.sh` ([SANDBOX.md](SANDBOX.md)). List images only; do not pull or build one.
 ```
 
 Add focused reconnaissance agents for materially distinct deployment modes or subsystems that these four do not map. Do not silently omit them: if the budget gate in `SKILL.md` blocks a focused agent, launch nothing for it, seed the unmapped area as a `deferred` ledger unit with reason `budget_cannot_reserve_critics_and_validation`, and disclose the gap in the report.
@@ -82,6 +83,7 @@ The parent synthesizes `<output-dir>/architecture.md`, with a hard cap of about 
 6. Repository-relative starting paths.
 7. Prior coverage gaps, changed-source and blocked revalidation targets, and same-source confirmed exclusions.
 8. A short companion-selection summary derived from [ATTACK-CLASSES.md](ATTACK-CLASSES.md): selected files and the source-visible boundaries that require them.
+9. The standards scope: which control families of [STANDARDS-CONFORMANCE.md](STANDARDS-CONFORMANCE.md) the target has a surface for, which it has none for and why, and how any standard the user named loosely was resolved ([STANDARDS.md](STANDARDS.md)).
 
 Keep the assignment-level ordinary block, selected companion blocks, and excluded blocks with reasons in each ledger unit, not in `architecture.md`. This keeps the architecture cap valid for large runs and makes the exact hunter prompt map machine-checkable.
 

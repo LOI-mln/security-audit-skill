@@ -2,7 +2,12 @@
 
 /**
  * Validates findings.json against report-schema.json.
- * Usage: node validate-findings.cjs <path-to-findings.json>
+ * Usage: node validate-findings.cjs [--require-standards] <path-to-findings.json>
+ *
+ * --require-standards makes a CWE and at least one framework reference
+ * (OWASP Top 10, OWASP ASVS or ISO/IEC 27001 Annex A) mandatory on confirmed
+ * and needs_validation records. Without it, `standards` stays optional so
+ * records written before the field existed still validate.
  *
  * This is a dependency-free interpreter for the JSON Schema keywords used by
  * report-schema.json, plus finding-specific checks that are clearer in code.
@@ -11,6 +16,7 @@
 const fs = require("fs");
 const path = require("path");
 const { TextDecoder } = require("util");
+const { collectStandardsErrors, hasFrameworkReference, hasReference } = require("./standards.cjs");
 
 const hasOwn = (value, key) => Object.prototype.hasOwnProperty.call(value, key);
 const SUPPORTED_TYPES = new Set(["object", "array", "string", "integer", "number", "boolean", "null"]);
@@ -482,7 +488,8 @@ function isSafeRelativeSourcePath(value) {
     !WINDOWS_RESERVED_COMPONENT.test(segment));
 }
 
-function collectFindingSemanticErrors(findings) {
+function collectFindingSemanticErrors(findings, options = {}) {
+  const requireStandards = options.requireStandards === true;
   const errors = createErrorList();
   if (!Array.isArray(findings)) return errors;
 
@@ -546,6 +553,17 @@ function collectFindingSemanticErrors(findings) {
     }
 
     const verdict = finding.verdict;
+    if (hasOwn(finding, "standards")) {
+      errors.push(...collectStandardsErrors(finding.standards, `${base}.standards`));
+    }
+    if (requireStandards && (verdict === "confirmed" || verdict === "needs_validation")) {
+      if (!hasReference(finding.standards, "cwe")) {
+        errors.push(`${base}.standards: ${verdict} finding requires at least one CWE reference`);
+      }
+      if (!hasFrameworkReference(finding.standards)) {
+        errors.push(`${base}.standards: ${verdict} finding requires an OWASP Top 10, OWASP ASVS or ISO/IEC 27001 reference`);
+      }
+    }
     if (verdict === "confirmed") {
       for (const forbidden of ["claimed_root_cause", "blockers", "validation_plan", "reason"]) {
         if (hasOwn(finding, forbidden)) errors.push(`${base}: confirmed finding must not contain ${safeQuote(forbidden)}`);
@@ -582,14 +600,14 @@ function collectFindingSemanticErrors(findings) {
   return errors;
 }
 
-function validateDocument(findings, schema) {
+function validateDocument(findings, schema, options = {}) {
   const schemaErrors = collectSchemaErrors(schema);
   if (schemaErrors.length > 0) return schemaErrors;
   const limitErrors = collectDataLimitErrors(findings, "$");
   if (limitErrors.length > 0) return limitErrors;
   const errors = collectUnchecked(findings, schema, "$");
   if (errors.length < LIMITS.validationErrors) {
-    errors.push(...collectFindingSemanticErrors(findings));
+    errors.push(...collectFindingSemanticErrors(findings, options));
   }
   return errors;
 }
@@ -700,11 +718,25 @@ function enforceJsonTextLimits(contents) {
   }
 }
 
-function run(file) {
-  if (!file) {
-    console.error("Usage: node validate-findings.cjs <path-to-findings.json>");
+function parseArguments(argv) {
+  const options = { requireStandards: false };
+  const files = [];
+  for (const argument of argv) {
+    if (argument === "--require-standards") options.requireStandards = true;
+    else if (typeof argument === "string" && argument.startsWith("--")) return null;
+    else files.push(argument);
+  }
+  if (files.length !== 1 || !files[0]) return null;
+  return { file: files[0], options };
+}
+
+function run(argv) {
+  const parsed = parseArguments(Array.isArray(argv) ? argv : [argv]);
+  if (!parsed) {
+    console.error("Usage: node validate-findings.cjs [--require-standards] <path-to-findings.json>");
     return 1;
   }
+  const { file, options } = parsed;
 
   let schema;
   try {
@@ -741,7 +773,7 @@ function run(file) {
 
   let errors;
   try {
-    errors = validateDocument(findings, schema);
+    errors = validateDocument(findings, schema, options);
   } catch {
     console.error("Failed to validate findings JSON: unexpected validation error");
     return 1;
@@ -757,17 +789,26 @@ function run(file) {
 }
 
 module.exports = {
+  JsonStructureError,
   LIMITS,
   PATH_FORBIDDEN_CHARACTER,
+  SafeInputError,
   UNSAFE_DIAGNOSTIC_CHARACTER,
   VISIBLE_CONTENT,
   WINDOWS_RESERVED_COMPONENT,
   collect,
   collectFindingSemanticErrors,
   collectSchemaErrors,
+  collectUnchecked,
+  createErrorList,
+  enforceJsonTextLimits,
+  escapeUnsafeDiagnosticCharacters,
   hasVisibleProse,
   isSafeRelativeSourcePath,
+  loadSchema,
+  readFileWithinLimit,
+  safeQuote,
   validateDocument,
 };
 
-if (require.main === module) process.exit(run(process.argv[2]));
+if (require.main === module) process.exit(run(process.argv.slice(2)));

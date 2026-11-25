@@ -1,18 +1,18 @@
 ---
 name: security-audit
-description: Security guidance and vulnerability review for codebases, APIs, services, CLI tools, libraries, and daemons. Use for security questions, focused reviews, vulnerability research, security audits, or pen tests. Run the complete workflow only for explicit codebase audit or pen-test requests, full/comprehensive/end-to-end reviews, or requested report artifacts.
+description: Security guidance, vulnerability review, and standards-based audit for codebases, APIs, services, CLI tools, libraries, and daemons. Use for security questions, focused reviews, vulnerability research, security audits, pen tests, and any request that names OWASP (Top 10, ASVS), CWE, ISO 27001, compliance, hardening, or a security report or remediation plan to hand to a developer or coding agent. Run the complete workflow only for explicit codebase audit or pen-test requests, full/comprehensive/end-to-end reviews, or requested report artifacts.
 ---
 
 # Security Audit
 
-Find vulnerabilities that violate a real trust boundary, then give owners the source evidence, safe reproduction, priority, and smallest effective fix. This is a defensive, source-first workflow. A candidate without a concrete affected principal, resource, or security outcome is not a confirmed finding.
+Find vulnerabilities that violate a real trust boundary, then give owners the source evidence, safe reproduction, priority, and smallest effective fix. Classify every reported record against CWE, the OWASP Top 10, OWASP ASVS and ISO/IEC 27001 Annex A, review the controls those standards expect, and end with a remediation plan a developer or coding agent can execute. This is a defensive, source-first workflow. A candidate without a concrete affected principal, resource, or security outcome is not a confirmed finding, and a missing control is a conformance gap, not a vulnerability.
 
 ## Operating modes
 
 This skill is guidance by default. Loading it does not authorize the complete audit workflow or file creation.
 
-- **Guidance mode**: For security questions, focused reviews, methodology, triage, or investigation of specific findings, use only the relevant parts of this skill. Do not automatically run all six phases, create an output directory, or write audit artifacts. You may launch focused agents when useful; they return results to the current task.
-- **Full audit mode**: Use the complete workflow when the user explicitly asks to audit or pen-test a codebase, asks for a full, comprehensive, or end-to-end security review, or requests report artifacts. Run all six phases and write the files defined below.
+- **Guidance mode**: For security questions, focused reviews, methodology, triage, or investigation of specific findings, use only the relevant parts of this skill. Do not automatically run the full workflow, create an output directory, or write audit artifacts. You may launch focused agents when useful; they return results to the current task.
+- **Full audit mode**: Use the complete workflow when the user explicitly asks to audit or pen-test a codebase, asks for a full, comprehensive, or end-to-end security review, or requests report artifacts. Run every phase and write the files defined below.
 
 If the request could mean either mode, ask one focused question before creating files or starting the complete workflow.
 
@@ -28,6 +28,8 @@ This skill is agent-neutral:
 
 Use equivalent platform capabilities while preserving role, write-isolation, prompt, and independence boundaries.
 
+Several steps say a block is "copied verbatim" into a delegated prompt. Where delegated agents can read the skill directory and the run's output directory, the parent may instead name the file and the exact block for the agent to read before anything else. The block is then part of the prompt all the same: the agent is bound by it, and the parent names every block the step lists, not a shorter selection. Use this to keep long shared blocks out of the parent's context; copy the text when an agent cannot read those paths.
+
 ## Universal execution safety
 
 These rules apply in both operating modes. Source inspection is read-only. Run target-controlled builds, tests, processes, browsers, emulators, fuzzers, and fixture processing only inside an OS-enforced sandbox that provides all of these controls:
@@ -38,6 +40,8 @@ These rules apply in both operating modes. Source inspection is read-only. Run t
 - explicit low CPU, memory, process, file-size, disk, and wall-clock limits.
 
 The agent, outside the target-controlled process, may make a disposable source copy in an assigned `scratch/` directory when a build must write beside source. In guidance mode, do not retain target-controlled files. In full audit mode, only trusted parent-side code may promote the minimum non-secret result to retained `artifacts/` using the procedure under Write isolation. Never expose a retained output directory (other than the agent's own assigned `scratch/`), another agent's directory, the host home directory, credentials, sockets, or shared services to target code. Do not install dependencies or let builds fetch them. Use only tools and dependencies already available locally. If every control cannot be enforced, do not execute target code: report the missing sandbox capability as a needs-validation blocker and give a safe validation plan.
+
+This skill ships a reference launcher and promotion helper for these controls: `sandbox-run.sh` runs one command in a container with no network, an allowlisted environment, a read-only target, scratch-only writes and low limits, and `promote-artifact.py` implements the promotion procedure under Write isolation. [SANDBOX.md](SANDBOX.md) explains how the parent approves a sandbox with them. They are one way to meet the rules above, not a relaxation of them: when no local container runtime or suitable local image exists, the blocker stands.
 
 Use dummy principals, fixtures, and secrets. Do not probe deployed endpoints, external services, shared infrastructure, production identities, other users' data, or live control planes. Do not test availability against a live or shared process, publish artifacts, alter releases, spend paid API quota, or continue beyond the minimum local effect needed to establish a defect. If the decisive fact is outside source or the sandboxed fixture, report it as needing validation.
 
@@ -59,9 +63,12 @@ The parent creates and is the only writer of shared run files:
 - `architecture.md`
 - `coverage-ledger.json`
 - `findings.json`
+- `conformance.json`
 - `REPORT.md`
 - `FINDINGS-DETAIL.md`
 - `NEEDS-VALIDATION.md`
+- `STANDARDS-REPORT.md`
+- `REMEDIATION.md`
 
 Each hunter or verifier receives a unique root under `<output-dir>/agents/<agent-id>/`, with separate `scratch/` and `artifacts/` directories. Canonical agent IDs match `^[a-z0-9][a-z0-9_-]{0,63}$` and must not equal a Windows device name such as `con`, `prn`, `aux`, `nul`, `com1` through `com9`, or `lpt1` through `lpt9`. Lowercase IDs prevent case-fold collisions. The agent and every target-controlled process may write only to `scratch/`; retained `artifacts/` is parent-owned, is never exposed to the sandbox, and is writable only by trusted parent-side promotion code. Agents may not change shared files, target source, retained artifacts, or another agent's directory. Do not use `/tmp` or the host home directory as a writable fallback.
 
@@ -83,7 +90,7 @@ Before execution, the parent opens and retains trusted, non-inheritable director
 
 For a reproduced check, record the command, exact test input, sandbox limits, and only the allowlisted environment variable names plus safe non-secret values needed to reproduce it. Never capture or copy the ambient environment, inherited variables, credential values, authentication state, or unrelated host paths. Launch from an empty environment rather than trying to redact one after execution.
 
-Before delegation, the parent writes `run-metadata.json` with at least `run_id`, `repo`, `target`, `source_ref`, `profile`, `scope_paths`, `budget` (null if unset), `execution_policy: "sandboxed-source-and-local-only"`, selected companion files, prior-run paths, shared-file owners, and `run_status: "in_progress"`. Update metadata only when those facts change; candidate state belongs in the coverage ledger and `findings.json`.
+Before delegation, the parent writes `run-metadata.json` with at least `run_id`, `repo`, `target`, `source_ref`, `profile`, `scope_paths`, `budget` (null if unset), `execution_policy: "sandboxed-source-and-local-only"`, selected companion files, the standards editions used and how any loosely named standard was resolved, the approved sandbox (runtime, image, self-test result) or the reason none is available, prior-run paths, shared-file owners, and `run_status: "in_progress"`. Update metadata only when those facts change; candidate state belongs in the coverage ledger and `findings.json`.
 
 ## Full audit planning
 
@@ -120,11 +127,11 @@ Profiles change breadth and redundancy, never the evidence bar. Do not scale awa
 
 The ledger makes spend countable: one unit is roughly one hunter assignment, and one surviving candidate is one or two verifier assignments depending on profile. When the user sets a budget — or the parent proposes one for a large target — record `budget` in `run-metadata.json` as a maximum number of agent invocations across all phases.
 
-Apply the strict budget gate before launching any reconnaissance agent. Reserve the four baseline reconnaissance calls, one final post-wave critic for `quick` or one post-wave plus one distinct final-clean critic for `standard`/`deep`, and at least one verifier call. Add focused reconnaissance only after repeating this gate for each extra call. If the requested budget cannot fund that minimum, launch no agent: ask for a larger budget, narrower scope, or different profile. If the request remains unchanged, set `run_status: "incomplete"` with `incomplete_reason: "budget_cannot_fund_reconnaissance_and_reserves"` and report that no audit pass ran.
+Apply the strict budget gate before launching any reconnaissance agent. Reserve the four baseline reconnaissance calls, one final post-wave critic for `quick` or one post-wave plus one distinct final-clean critic for `standard`/`deep`, at least one verifier call, and the standards conformance review (one reviewer and one gap verifier per family group, three groups by default). Add focused reconnaissance only after repeating this gate for each extra call. If the requested budget cannot fund that minimum, launch no agent: ask for a larger budget, narrower scope, or different profile. If the request remains unchanged, set `run_status: "incomplete"` with `incomplete_reason: "budget_cannot_fund_reconnaissance_and_reserves"` and report that no audit pass ran.
 
 Spend it in this order:
 
-1. Count reconnaissance, every post-wave critic, and the separate final-clean critic as agent invocations.
+1. Count reconnaissance, every post-wave critic, the separate final-clean critic, and every conformance reviewer and gap verifier as agent invocations.
 2. **Reserve critics and validation before hunting.** For `quick`, reserve its one post-wave final critic. Before every `standard` or `deep` hunter wave, reserve one immediate post-wave critic plus one distinct final-clean critic. Also reserve verifier cost from the profile (about 1 or 2 agents per expected candidate; when in doubt reserve 30% of the balance after critic reservation). Never assign hunters into either reserve.
 3. Assign hunters to units in priority order until the hunting allowance is spent. Spend the reserved post-wave critic immediately after that wave; keep the final-clean and validation reserves intact.
 4. Before a later wave, reserve its new post-wave critic again. If the remaining budget cannot cover the required critic calls and validation reserve, launch no hunters from that wave, mark its planned units `deferred` with reason `budget_cannot_reserve_critics_and_validation`, and use the retained final-clean critic to record the resulting gap.
@@ -161,22 +168,28 @@ Calibrate overall severity with these anchors:
 
 The high/medium discriminator: does the demonstrated result fully defeat an explicit control for an action with real consequences, or only weaken it? If you cannot state the concrete damage, the severity is lower than it feels.
 
+### Classify against standards without moving the evidence bar
+
+Every `confirmed` and `needs_validation` record carries a `standards` object: at least one CWE and one reference among the OWASP Top 10, OWASP ASVS and ISO/IEC 27001 Annex A, chosen with [STANDARDS.md](STANDARDS.md). The mapping classifies a record that the evidence already settled. It never raises a verdict or a severity, and an identifier that `standards-index.json` does not contain fails validation. Controls the standards expect are reviewed separately in [STANDARDS-CONFORMANCE.md](STANDARDS-CONFORMANCE.md); a missing control is recorded there as a `gap` with a priority, and enters `findings.json` only if hunting demonstrates a boundary failure. A source review gives evidence relevant to a standard. It does not certify conformity with one.
+
 ### Recommend the smallest effective source fix
 
-For each confirmed finding, identify the invariant the code must enforce and the narrowest source change that enforces it at the last trusted decision point. Prefer specific repository-relative changes and regression tests over generic hardening advice. The audit describes fixes; it does not modify target source.
+For each confirmed finding, identify the invariant the code must enforce and the narrowest source change that enforces it at the last trusted decision point. Prefer specific repository-relative changes and regression tests over generic hardening advice. The audit describes fixes; it does not modify target source. Its last artifact, `REMEDIATION.md`, turns those fixes into ordered tasks that a developer or coding agent executes afterwards in the target repository ([REMEDIATION-HANDOFF.md](REMEDIATION-HANDOFF.md)).
 
 ## Full audit workflow
 
-In full audit mode, follow all six phases in order:
+In full audit mode, follow these phases in order. Phase 2b runs alongside Phase 2:
 
 1. **Reconnaissance** — map the source, trust boundaries, local build paths, companion selections, prior evidence, and initial deterministic coverage ledger with [RECONNAISSANCE.md](RECONNAISSANCE.md).
 2. **Coverage-led hunting waves** — assign isolated hunters from the ledger and collect structured candidate results with [HUNTING.md](HUNTING.md), [ATTACK-CLASSES.md](ATTACK-CLASSES.md), and the selected domain companions.
+   - **2b. Standards conformance review** — in parallel with hunting, review the checklist controls and write `conformance.json` with [STANDARDS-CONFORMANCE.md](STANDARDS-CONFORMANCE.md) and [STANDARDS.md](STANDARDS.md).
 3. **Candidate validation** — consolidate fingerprints and give every candidate to a fresh source verifier as defined in [VALIDATION-AND-REPORTING.md](VALIDATION-AND-REPORTING.md).
-4. **Structured output** — write all final `confirmed`, `needs_validation`, and `rejected` records to `findings.json`; validate it with `report-schema.json` and `validate-findings.cjs`, and validate the coverage claim with `validate-coverage-ledger.cjs`.
+4. **Structured output** — write all final `confirmed`, `needs_validation`, and `rejected` records to `findings.json`; validate it with `report-schema.json` and `validate-findings.cjs --require-standards`, validate the coverage claim with `validate-coverage-ledger.cjs`, and validate `conformance.json` with `validate-conformance.cjs`.
 5. **Independent record verification** — use fresh agents to verify final source claims and reconcile corrections or state changes.
-6. **Target-neutral report** — derive `REPORT.md`, `FINDINGS-DETAIL.md`, and `NEEDS-VALIDATION.md` from the final records, with no live-probe instructions.
+6. **Target-neutral report** — derive `REPORT.md`, `FINDINGS-DETAIL.md`, `NEEDS-VALIDATION.md`, and `STANDARDS-REPORT.md` from the final records, with no live-probe instructions.
+7. **Remediation handoff** — write `REMEDIATION.md`, the ordered work order for whoever fixes the code, with [REMEDIATION-HANDOFF.md](REMEDIATION-HANDOFF.md).
 
-Do not end the run before one of exactly two terminal states: (a) all Phase 6 artifacts are written and both validators pass, or (b) `run_status: "incomplete"` is recorded with its exact reason and the gap is disclosed in the report. Never stop mid-phase.
+Do not end the run before one of exactly two terminal states: (a) all Phase 6 and Phase 7 artifacts are written and the three validators pass, or (b) `run_status: "incomplete"` is recorded with its exact reason and the gap is disclosed in the report. Never stop mid-phase.
 
 ## Anti-patterns
 
@@ -190,3 +203,7 @@ Do not end the run before one of exactly two terminal states: (a) all Phase 6 ar
 8. Re-reporting carried same-source prior confirmed records or using them as exemplars that anchor the hunt.
 9. Assigning severity to `needs_validation` records.
 10. Writing the report before independent verification or letting prose and JSON disagree.
+11. Citing a standard identifier that is not in `STANDARDS.md` or `standards-index.json`, or inventing one to match how the user named a standard.
+12. Promoting a conformance gap to a finding without a demonstrated boundary failure, or dropping a gap because nobody demonstrated one.
+13. Writing that the target is, or is not, compliant with ISO/IEC 27001 or certified against ASVS on the strength of a source review.
+14. Writing a remediation task from a `needs_validation` or `rejected` record, or one whose change is "review" or "consider".
