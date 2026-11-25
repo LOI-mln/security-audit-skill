@@ -69,6 +69,7 @@ If you ask for a standard by an approximate name ("OWASP 1000", "ISO 7400"), the
 | `validate-findings.cjs` | Zero-dependency validator for `findings.json` in Phases 4 and 5 |
 | `validate-conformance.cjs` | Zero-dependency validator for `conformance.json`, including checklist completeness |
 | `validate-coverage-ledger.cjs` | Zero-dependency validator for `coverage-ledger.json` in Phases 1–5 |
+| `render-reports.cjs` | Writes the report files and `REMEDIATION.md` from the validated records, so prose and JSON cannot disagree |
 | `sandbox-run.sh` | Runs one command in a container with no network, an allowlisted environment, a read-only target and low limits |
 | `promote-artifact.py` | Copies declared evidence files out of an agent's scratch directory without following links |
 | `*.test.cjs` | Tests for the validators and helpers, run with `node --test` |

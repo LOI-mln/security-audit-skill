@@ -13,6 +13,7 @@ Write it only after Phase 6, from the same final records. It adds no claim, no s
 | `confirmed` record | A task. Its severity orders it |
 | `gap` control in `conformance.json` | A task. Its priority orders it, after confirmed records of the same level |
 | `gap` with `related_fingerprints` | Part of the task for that finding: one root cause, one task |
+| `gap` whose fix is a product or deployment choice (a new feature such as multi-factor authentication, a retention policy, a call to an outside service) | An entry under **Needs a decision**, with the question and the fix that follows a yes |
 | `needs_validation` record | An entry under **Needs a decision**. Never a task: the defect is not established, and a blind fix can hide the question |
 | `not_assessed` control | An entry under **Needs a decision**, with its `owner_check` |
 | `rejected` record, `met` or `not_applicable` control | Nothing |

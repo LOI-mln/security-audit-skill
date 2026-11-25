@@ -262,6 +262,11 @@
             "minLength": 1,
             "visibleContent": true
           },
+          "summary": {
+            "type": "string",
+            "minLength": 1,
+            "visibleContent": true
+          },
           "reason": {
             "type": "string",
             "minLength": 1,
@@ -350,6 +355,11 @@
             "const": "not_assessed"
           },
           "title": {
+            "type": "string",
+            "minLength": 1,
+            "visibleContent": true
+          },
+          "summary": {
             "type": "string",
             "minLength": 1,
             "visibleContent": true

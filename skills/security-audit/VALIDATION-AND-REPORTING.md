@@ -159,6 +159,8 @@ Do not verify only `confirmed` records. A misleading `needs_validation` handoff 
 
 Only after Phase 5 passes for every record retained in `findings.json`, derive prose from the final records, the ledger, `conformance.json`, and the hunter `hardening` notes retained in ledger bookkeeping. An incomplete run may report independently verified records, but it must identify each unresolved ledger candidate and must not present it as a finding. The prose files never change a verdict, severity, blocker, or demonstrated impact.
 
+`node <skill-dir>/render-reports.cjs <output-dir>` writes a first version of the four Phase 6 files and of `REMEDIATION.md` directly from `run-metadata.json`, `findings.json`, `conformance.json` and `coverage-ledger.json`, so every level, blocker and fix in the prose is the one in the records. Run it after both validators pass. It reads these optional `run-metadata.json` fields: `posture_summary` (the short security posture paragraph, which the parent writes), `verify_command` (the local test command from Phase 1), `critic_result`, `outside_repository`, and `gap_decisions` (a map from control identifier to the question for the owner, for a gap whose fix is a product or deployment choice such as adding multi-factor authentication; the renderer lists it under **Needs a decision** instead of writing a task). The parent then reads every file against the sections below and may improve wording, add a missing judgement such as task ordering inside a level or a sibling path to watch, and nothing else.
+
 #### `REPORT.md`
 
 Write:
